@@ -1154,7 +1154,9 @@ utils::globalVariables(c("groupDomains", "layers", "prestats_data", "scales", "s
 calculated_theme_elements <- function(plot) {
   if (is.function(asNamespace("ggplot2")$complete_theme)) {
     theme <- ggplot2::complete_theme(plot$theme)
-    elements <- names(theme)
+    # All settings that have >0 parent need to be calculated
+    elements <- lapply(ggplot2::get_element_tree(), `[[`, i = "inherit")
+    elements <- names(elements)[lengths(elements) > 0]
   } else {
     theme <- ggfun("plot_theme")(plot)
     elements <- names(which(sapply(theme, inherits, "element")))
